@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telefon Raqamlar Ro'yxati</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .form-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      border: 2px solid #007BFF;
+      border-radius: 5px;
+      padding: 10px;
+      width: 270px;
+      height: 50px;
+      font-size: 18px;
+    }
+    button {
+      background-color: #0077ff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 120px;
+      font-size: 22px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .list {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: rgb(34, 255, 0); 
+      position: relative;
+      height: 70px;
+    }
+    .list-item.yellow {
+      background-color: #f2ff00; 
+    }
+    .list-item.red {
+      background-color: #ff0000; 
+    }
+    .timer {
+      font-size: 12px;
+      color: #555;
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+    }
+    .clear-all {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    #del{
+        background: red;
+        width: 180px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Telefon Raqamlar Ro'yxati</h1>
+  <div class="form-container">
+    <input type="text" id="phoneInput" placeholder="+998(XX) XXX 0114" >
+    <button onclick="addPhoneNumber()">Qo'shish</button>
+  </div>
+  <div class="list" id="phoneList"></div>
+  <div class="clear-all">
+    <button onclick="clearAllNumbers()" id="del">Hammasini o'chirish</button>
+  </div>
+
+  <script>
+    const phoneList = document.getElementById('phoneList');
+
+    function addPhoneNumber() {
+      const phoneInput = document.getElementById('phoneInput');
+      const phoneNumber = phoneInput.value.trim();
+
+      if (phoneNumber) {
+        const listItem = document.createElement('div');
+        listItem.className = 'list-item';
+        listItem.innerHTML = `
+          <span>${phoneNumber}</span>
+          <button onclick="removePhoneNumber(this)">O'chirish</button>
+          <div class="timer"></div>
+        `;
+        phoneList.appendChild(listItem);
+
+        startTimer(listItem, 72 * 60 * 60);
+
+        phoneInput.value = ''; 
+      } else {
+        alert('Telefon raqamni kiriting!');
+      }
+    }
+
+    function startTimer(listItem, duration) {
+      const timerElement = listItem.querySelector('.timer');
+      let timeLeft = duration;
+
+      const interval = setInterval(() => {
+        const hours = Math.floor(timeLeft / 3600);
+        const minutes = Math.floor((timeLeft % 3600) / 60);
+        const seconds = timeLeft % 60;
+
+        timerElement.textContent = `${hours} soat ${minutes} daqiqa ${seconds} soniya`;
+
+        if (timeLeft <= duration / 2 && timeLeft > duration / 4) {
+          listItem.classList.add('yellow');
+          listItem.classList.remove('red');
+        } else if (timeLeft <= duration / 4) {
+          listItem.classList.add('red');
+          listItem.classList.remove('yellow');
+        }
+
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          timerElement.textContent = "Tugadi!";
+        }
+
+        timeLeft--;
+      }, 1000); 
+    }
+
+    function removePhoneNumber(button) {
+      const listItem = button.parentElement;
+      phoneList.removeChild(listItem);
+    }
+
+    function clearAllNumbers() {
+      phoneList.innerHTML = '';
+    }
+
+
+    const phoneInput = document.getElementById('phoneInput');
+
+phoneInput.addEventListener('input', function () {
+  let value = phoneInput.value.replace(/\D/g, ''); // Faqat raqamlarni saqlash
+  if (!value.startsWith('998')) {
+    value = '998' + value; // Agar boshlanishida +998 bo'lmasa, qo'shib qo'yiladi
+  }
+
+  // Formatlash
+  const formatted = '+998 ' +
+    value.substring(3, 5) + ' ' + // 99
+    value.substring(5, 8) + ' ' + // 395
+    value.substring(8, 12);      // 0114
+
+  phoneInput.value = formatted.trim(); // Yozilgan matnni yangilash
+});
+  </script>
+</body>
+</html>
